@@ -3,6 +3,9 @@ package com.example.AirplaneBooking.model.entity;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.example.AirplaneBooking.model.enums.FlightStatus;
+
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -43,11 +46,19 @@ public class Flight {
     @Column(name = "available_seats")
     private Integer availableSeats;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private FlightStatus status = FlightStatus.SCHEDULED;
+
     public void updateAvailableSeats(Integer bookedSeats) {
         if (this.aircraft != null && this.aircraft.getTotalSeats() != null) {
             this.availableSeats = this.aircraft.getTotalSeats() - bookedSeats;
         } else {
             throw new IllegalStateException("Aircraft or total seats information is missing");
         }
+    }
+
+    public FlightStatus getStatus() {
+        return status;
     }
 }

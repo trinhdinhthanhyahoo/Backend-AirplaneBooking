@@ -6,6 +6,7 @@ import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+import com.example.AirplaneBooking.model.enums.FlightStatus;
 
 @Data
 @NoArgsConstructor
@@ -19,4 +20,5 @@ public class CreateFlightDTO {
     private LocalDateTime arrivalDateTime;
     private BigDecimal baseFare;
     private Integer availableSeats;
+    private FlightStatus status = FlightStatus.SCHEDULED;
 }

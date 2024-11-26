@@ -3,10 +3,13 @@ package com.example.AirplaneBooking.service;
 import com.example.AirplaneBooking.dto.booking.CreateBookingDTO;
 import com.example.AirplaneBooking.dto.booking.BookingDTO;
 import com.example.AirplaneBooking.model.entity.Booking;
+import com.example.AirplaneBooking.model.entity.Flight;
 import com.example.AirplaneBooking.repository.BookingRepository;
+import com.example.AirplaneBooking.repository.FlightRepository;
 import com.example.AirplaneBooking.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +24,20 @@ import java.util.stream.Collectors;
 public class BookingService {
     private final BookingRepository bookingRepository;
     private final ModelMapper modelMapper;
+    @Autowired
+    private FlightRepository flightRepository;
 
     public BookingDTO create(CreateBookingDTO createDTO) {
+        Flight flight = flightRepository.findById(createDTO.getFlightId())
+                .orElseThrow(() -> new ResourceNotFoundException("Flight not found"));
+
         Booking booking = modelMapper.map(createDTO, Booking.class);
+        booking.setFlight(flight);
         booking.setBookingDate(LocalDateTime.now());
         booking = bookingRepository.save(booking);
-        return modelMapper.map(booking, BookingDTO.class);
+        BookingDTO bookingDTO = modelMapper.map(booking, BookingDTO.class);
+        bookingDTO.setFlightId(flight.getFlightId());
+        return bookingDTO;
     }
 
     public BookingDTO findById(UUID id) {

@@ -1,6 +1,7 @@
 package com.example.AirplaneBooking.controller;
 
 import com.example.AirplaneBooking.dto.flight.FlightDTO;
+import com.example.AirplaneBooking.model.enums.FlightStatus;
 import com.example.AirplaneBooking.dto.flight.CreateFlightDTO;
 import com.example.AirplaneBooking.service.FlightService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -75,6 +76,23 @@ public class FlightController {
             @Parameter(description = "ID of the flight") @PathVariable UUID id) {
         FlightDTO flight = flightService.findById(id);
         return ResponseEntity.ok(flight.getAvailableSeats());
+    }
+
+    @Operation(summary = "Update flight status", description = "Updates the status of a flight")
+    @ApiResponse(responseCode = "200", description = "Status updated successfully")
+    @ApiResponse(responseCode = "404", description = "Flight not found")
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<FlightDTO> updateStatus(
+            @Parameter(description = "ID of the flight") @PathVariable UUID id,
+            @Parameter(description = "New status") @RequestParam FlightStatus status) {
+        return ResponseEntity.ok(flightService.updateStatus(id, status));
+    }
+
+    @GetMapping("/status/{status}")
+    @Operation(summary = "Get flights by status", description = "Returns all flights with the specified status")
+    public ResponseEntity<List<FlightDTO>> getFlightsByStatus(
+            @Parameter(description = "Status to filter by") @PathVariable FlightStatus status) {
+        return ResponseEntity.ok(flightService.findByStatus(status));
     }
 
 }

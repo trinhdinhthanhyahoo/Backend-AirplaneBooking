@@ -2,6 +2,7 @@ package com.example.AirplaneBooking.dto.booking;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -20,4 +21,5 @@ public class BookingDTO {
     private String paymentStatus;
     private LocalDateTime bookingDate;
     private Integer passengerCount;
+    private List<String> seatCodes;
 }

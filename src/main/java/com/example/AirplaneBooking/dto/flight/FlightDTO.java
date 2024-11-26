@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
+
+import com.example.AirplaneBooking.model.enums.FlightStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 @Data
@@ -28,4 +30,9 @@ public class FlightDTO {
 
     private BigDecimal baseFare;
     private Integer availableSeats;
+    private FlightStatus status;
+
+    void setStatus(FlightStatus status) {
+        this.status = status;
+    }
 }

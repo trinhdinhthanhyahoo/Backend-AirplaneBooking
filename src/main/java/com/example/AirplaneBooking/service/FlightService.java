@@ -13,6 +13,7 @@ import com.example.AirplaneBooking.dto.flight.FlightDTO;
 
 import com.example.AirplaneBooking.repository.FlightRepository;
 import com.example.AirplaneBooking.repository.BookingRepository;
+import com.example.AirplaneBooking.repository.SeatRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.AirplaneBooking.model.enums.FlightStatus;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -33,6 +36,8 @@ public class FlightService {
     private FlightRepository flightRepository;
     @Autowired
     private BookingRepository bookingRepository;
+    @Autowired
+    private SeatRepository seatRepository;
     private final ModelMapper modelMapper;
 
     public FlightDTO create(CreateFlightDTO createDTO) {
@@ -65,6 +70,7 @@ public class FlightService {
                 .arrivalDateTime(flight.getArrivalDateTime())
                 .baseFare(flight.getBaseFare())
                 .availableSeats(flight.getAvailableSeats())
+                .status(flight.getStatus())
                 .build();
     }
 
@@ -87,10 +93,15 @@ public class FlightService {
         Flight flight = flightRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Flight not found with id: " + id));
 
-        bookingRepository.deleteById(id);
+        // Delete associated seats first
+        seatRepository.deleteByFlightId(id);
 
+        // Delete associated bookings
+        bookingRepository.deleteByFlight_FlightId(id);
+
+        // Finally delete the flight
         flightRepository.delete(flight);
-        flightRepository.flush(); // Đảm bảo thay đổi được ghi vào DB ngay lập tức
+        flightRepository.flush();
     }
 
     public List<FlightDTO> searchFlights(UUID departureAirportId, UUID arrivalAirportId, LocalDate departureDate) {
@@ -110,5 +121,29 @@ public class FlightService {
         Integer bookedSeats = flightRepository.countBookedSeatsByFlightId(flightId);
         flight.updateAvailableSeats(bookedSeats);
         flightRepository.save(flight);
+    }
+
+    @Transactional
+    public FlightDTO updateStatus(UUID id, FlightStatus status) {
+        Flight flight = flightRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Flight not found with id: " + id));
+
+        // Add validation if needed
+        if (status == FlightStatus.CANCELLED) {
+            // You might want to handle cancellations specially
+            // For example, notify passengers, handle refunds, etc.
+        }
+
+        flight.setStatus(status);
+        flight = flightRepository.save(flight);
+        log.info("Updated status of flight {} to {}", id, status);
+        return convertToDTO(flight);
+    }
+
+    public List<FlightDTO> findByStatus(FlightStatus status) {
+        return flightRepository.findByStatus(status)
+                .stream()
+                .map(this::convertToDTO)
+                .collect(Collectors.toList());
     }
 }

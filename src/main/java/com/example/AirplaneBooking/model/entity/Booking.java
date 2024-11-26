@@ -2,6 +2,7 @@ package com.example.AirplaneBooking.model.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import jakarta.persistence.*;
 import lombok.*;
@@ -17,7 +18,7 @@ public class Booking {
     @Column(name = "booking_id")
     private UUID bookingId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "flight_id")
     private Flight flight;
 
@@ -41,4 +42,9 @@ public class Booking {
 
     @Column(name = "passenger_count")
     private Integer passengerCount;
+
+    @ElementCollection
+    @CollectionTable(name = "booking_seats", joinColumns = @JoinColumn(name = "booking_id"))
+    @Column(name = "seat_code")
+    private List<String> seatCodes;
 }

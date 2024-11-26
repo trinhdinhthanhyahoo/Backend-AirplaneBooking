@@ -4,7 +4,9 @@ import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.example.AirplaneBooking.dto.booking.BookingDTO;
 import com.example.AirplaneBooking.dto.flight.FlightDTO;
+import com.example.AirplaneBooking.model.entity.Booking;
 import com.example.AirplaneBooking.model.entity.Flight;
 import com.example.AirplaneBooking.model.entity.Passenger;
 import com.example.AirplaneBooking.dto.passenger.PassengerDTO;
@@ -42,6 +44,10 @@ public class ModelMapperConfig {
                 .addMappings(mapper -> {
                     mapper.map(Passenger::getFullName, PassengerDTO::setFullName);
                     // Add other explicit mappings if needed
+                });
+        modelMapper.createTypeMap(Booking.class, BookingDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(src -> src.getFlight().getFlightId(), BookingDTO::setFlightId);
                 });
 
         return modelMapper;

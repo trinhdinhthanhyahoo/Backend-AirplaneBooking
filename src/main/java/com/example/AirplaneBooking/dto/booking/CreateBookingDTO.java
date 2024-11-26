@@ -1,6 +1,7 @@
 package com.example.AirplaneBooking.dto.booking;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,4 +18,5 @@ public class CreateBookingDTO {
     private String status;
     private String paymentStatus;
     private Integer passengerCount;
+    private List<String> seatCodes;
 }
